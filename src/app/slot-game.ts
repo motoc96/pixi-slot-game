@@ -57,7 +57,7 @@ export class SlotGame extends Application {
      * */
     protected onResize(): void {
         // Get the new width and height of the window
-        const newWidth = window.innerWidth;
+        const newWidth = window.innerWidth ;
         const newHeight = window.innerHeight;
         
         this.renderer.resize(newWidth, newHeight);
