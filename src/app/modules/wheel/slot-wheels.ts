@@ -46,7 +46,6 @@ export class SlotWheel extends Container {
         this.initSymbolsOnDisplay();
         SlotGameEventEmitter.on(SlotGameEvents.START_WHEEL_SPIN, this.startWheelSpin.bind(this));
         SlotGameEventEmitter.on(SlotGameEvents.STOP_WHEEL_SPIN,this.stopWheelSpin.bind(this));
-        SlotGameEventEmitter.on(SlotGameEvents.WINNINGS_DISPLAY_COMPLTE, this.onWinningsDisplayCompleted.bind(this))
         SlotGameEventEmitter.on(SlotGameEvents.ON_GAME_RESIZED, this.onResize.bind(this));
     }
 
@@ -200,26 +199,26 @@ export class SlotWheel extends Container {
         });
     }
 
-/**
- * Smoothly aligns the symbols to their final positions
- */
-protected smoothAlignSymbols(callback: Function): void {
-    const symbolSize: number = SlotWheelUtils.SYMBOL_SIZE;
-    _.forEach(this.onDisplaySymbols, (symbol, index) => {
-        const targetY = index * symbolSize; // Calculate the target position for each symbol
-        gsap.to(symbol, {
-            y: targetY , 
-            duration:SlotWheelUtils.SMOOTH_DURATION, 
-            ease: "power1.out", 
-            onComplete: ()=> {
-                // callback only when the last symbol is aligned to the wheel
-                if(index == this.onDisplaySymbols.length-1){
-                    callback();
+    /**
+     * Smoothly aligns the symbols to their final positions
+     */
+    protected smoothAlignSymbols(callback: Function): void {
+        const symbolSize: number = SlotWheelUtils.SYMBOL_SIZE;
+        _.forEach(this.onDisplaySymbols, (symbol, index) => {
+            const targetY = index * symbolSize; // Calculate the target position for each symbol
+            gsap.to(symbol, {
+                y: targetY , 
+                duration:SlotWheelUtils.SMOOTH_DURATION, 
+                ease: "power1.out", 
+                onComplete: ()=> {
+                    // callback only when the last symbol is aligned to the wheel
+                    if(index == this.onDisplaySymbols.length-1){
+                        callback();
+                    }
                 }
-            }
+            });
         });
-    });
-}
+    }
 
     /**
      * Gets the next symbol in the sequence
@@ -255,48 +254,13 @@ protected smoothAlignSymbols(callback: Function): void {
             }
         })
         SlotGameEventEmitter.emit(SlotGameEvents.WHEEL_SPIN_COMPLETE, winningSymbolsID);
-        this.showSymbolWinningBackground(winningSymbols);
-    }
-
-    /**
-     * Used to show the winnings background for each type of winning
-     * @param symbols 
-     */
-    protected showSymbolWinningBackground(symbols: Array<SlotWheelSymbol>) : void {
-        if(symbols[0].symbolID === symbols[1].symbolID && symbols[1].symbolID === symbols[2].symbolID){ 
-            _.forEach(symbols,(symbol)=>{
-                symbol.winBg.visible = true;
-            })
-        }
-        if(symbols[0].symbolID === symbols[1].symbolID){
-            symbols[0].winBg.visible = true;
-            symbols[1].winBg.visible = true;
-        }
-        if(symbols[0].symbolID === symbols[2].symbolID){
-            symbols[0].winBg.visible = true;
-            symbols[2].winBg.visible = true;
-        } 
-        if(symbols[1].symbolID === symbols[2].symbolID) {
-            symbols[1].winBg.visible = true;
-            symbols[2].winBg.visible = true;
-        }
-        
-    }
-
-    /**
-     * Handler for when winnings are completed
-     */
-    protected onWinningsDisplayCompleted(): void {
-        _.forEach(this.onDisplaySymbols,(symbol)=>{
-            symbol.winBg.visible =false;
-        })
+        SlotGameEventEmitter.emit(SlotGameEvents.SHOW_WINNINGS_ANIMATIONS, winningSymbols);
     }
 
     /**
      * Method used when we are resizing the window
      */
     protected onResize(): void {
-        this.reelBackground.scale.set(SlotGlobalUtils.scale);
         this.positionWheelBackground();
         this.positionSymbolsContainer();
         this.positionSymbolsContainerMask();

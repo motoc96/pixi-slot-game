@@ -26,6 +26,9 @@ export class SlotUserInterface extends Container {
     constructor() {
         super();
         this.initUI()
+        if(_.isNil(this.slotWinningsHandler)){
+            this.slotWinningsHandler = new SlotWinningsHandler();
+        }
         SlotGameEventEmitter.on(SlotGameEvents.WHEEL_SPIN_COMPLETE, this.onWheelSpinComplete.bind(this));
         SlotGameEventEmitter.on(SlotGameEvents.ON_GAME_RESIZED, this.onResize.bind(this));
     }
@@ -184,9 +187,6 @@ export class SlotUserInterface extends Container {
      * @param winningsSymbols Array of symbols from the spin
      */
     protected displayWinnings(winningsSymbols: Array<number>): void {
-        if(_.isNil(this.slotWinningsHandler)){
-            this.slotWinningsHandler = new SlotWinningsHandler();
-        }
         const winValue: number = this.slotWinningsHandler.handleWinnings(winningsSymbols)
         this.updateWin(winValue);
         
