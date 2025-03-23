@@ -209,7 +209,7 @@ export class SlotWheel extends Container {
             gsap.to(symbol, {
                 y: targetY , 
                 duration:SlotWheelUtils.SMOOTH_DURATION, 
-                ease: "power1.out", 
+                ease: "power1.inOut", 
                 onComplete: ()=> {
                     // callback only when the last symbol is aligned to the wheel
                     if(index == this.onDisplaySymbols.length-1){
